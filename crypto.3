@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MATRIX_SIZE 5
+
+
+void prepareMatrix(char *key, char matrix[MATRIX_SIZE][MATRIX_SIZE]) {
+    int i, j, k;
+    char alphabet[26] = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; 
+    int len = strlen(key);
+    int index = 0;
+
+    
+    for (i = 0; i < MATRIX_SIZE; i++) {
+        for (j = 0; j < MATRIX_SIZE; j++) {
+            if (index < len) {
+                matrix[i][j] = toupper(key[index]);
+                index++;
+            } else {
+                
+                while (1) {
+                    if (strchr(key, alphabet[index]) == NULL) {
+                        matrix[i][j] = alphabet[index];
+                        index++;
+                        break;
+                    }
+                    index++;
+                }
+            }
+        }
+    }
+}
+
+
+void findPosition(char matrix[MATRIX_SIZE][MATRIX_SIZE], char ch, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < MATRIX_SIZE; i++) {
+        for (j = 0; j < MATRIX_SIZE; j++) {
+            if (matrix[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+
+
+void encrypt(char matrix[MATRIX_SIZE][MATRIX_SIZE], char *plaintext) {
+    int i, row1, col1, row2, col2;
+    for (i = 0; i < strlen(plaintext); i += 2) {
+        
+        findPosition(matrix, toupper(plaintext[i]), &row1, &col1);
+        findPosition(matrix, toupper(plaintext[i + 1]), &row2, &col2);
+
+       
+        if (row1 == row2) {
+            printf("%c%c", matrix[row1][(col1 + 1) % MATRIX_SIZE], matrix[row2][(col2 + 1) % MATRIX_SIZE]);
+        }
+        
+        else if (col1 == col2) {
+            printf("%c%c", matrix[(row1 + 1) % MATRIX_SIZE][col1], matrix[(row2 + 1) % MATRIX_SIZE][col2]);
+        }
+       
+        else {
+            printf("%c%c", matrix[row1][col2], matrix[row2][col1]);
+        }
+    }
+}
+
+int main() {
+    char key[100];
+    char matrix[MATRIX_SIZE][MATRIX_SIZE];
+    char plaintext[1000];
+
+    printf("Enter the key: ");
+    fgets(key, sizeof(key), stdin);
+
+    printf("Enter the plaintext: ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+
+    
+    key[strcspn(key, "\n")] = '\0';
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+
+    prepareMatrix(key, matrix);
+
+    printf("Encrypted text: ");
+    encrypt(matrix, plaintext);
+    printf("\n");
+
+    return 0;
+}
