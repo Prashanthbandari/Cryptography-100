@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+#define SIZE 5
+
+
+void printPlayfairMatrix(char keyTable[SIZE][SIZE]) {
+    printf("Playfair Matrix:\n");
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%c ", keyTable[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    char keyTable[SIZE][SIZE] = {
+        {'M', 'F', 'H', 'I', 'J'},
+        {'U', 'N', 'O', 'P', 'Q'},
+        {'Z', 'V', 'W', 'X', 'Y'},
+        {'E', 'L', 'A', 'R', 'G'},
+        {'D', 'S', 'T', 'B', 'C'}
+    };
+
+   
+    printPlayfairMatrix(keyTable);
+
+    return 0;
+}
