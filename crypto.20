@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+
+void encrypt_ecb(const uint8_t *plaintext, uint8_t *ciphertext, size_t length, const uint8_t *key);
+void decrypt_ecb(const uint8_t *ciphertext, uint8_t *plaintext, size_t length, const uint8_t *key);
+
+int main() {
+  
+    uint8_t plaintext[] = "This is a test message.";
+    uint8_t key[] = "abcdefghijklmnop"; 
+
+  
+    size_t length = strlen((char *)plaintext);
+
+    
+    uint8_t ciphertext[length];
+
+    
+    encrypt_ecb(plaintext, ciphertext, length, key);
+
+   
+    printf("Encrypted Text (ECB): ");
+    for (size_t i = 0; i < length; ++i) {
+        printf("%02x", ciphertext[i]);
+    }
+    printf("\n");
+
+    
+    uint8_t decrypted[length + 1]; 
+
+    decrypt_ecb(ciphertext, decrypted, length, key);
+
+    
+    decrypted[length] = '\0'; 
+    printf("Decrypted Text (ECB): %s\n", decrypted);
+
+    return 0;
+}
+
+void encrypt_ecb(const uint8_t *plaintext, uint8_t *ciphertext, size_t length, const uint8_t *key) {
+    
+    for (size_t i = 0; i < length; i += 16) { 
+        for (size_t j = 0; j < 16; ++j) {
+            ciphertext[i + j] = plaintext[i + j] ^ key[j];
+        }
+    }
+}
+
+void decrypt_ecb(const uint8_t *ciphertext, uint8_t *plaintext, size_t length, const uint8_t *key) {
+    
+    for (size_t i = 0; i < length; i += 16) { 
+        for (size_t j = 0; j < 16; ++j) {
+            plaintext[i + j] = ciphertext[i + j] ^ key[j];
+        }
+    }
+}
