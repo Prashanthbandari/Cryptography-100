@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to calculate greatest common divisor (GCD)
+int gcd(int a, int b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+// Function to generate public and private key pairs
+void generate_keys(int p, int q, int *e, int *d, int *n) {
+    int phi = (p - 1) * (q - 1);
+
+    // Choose public key e
+    *e = 2;
+    while (gcd(*e, phi) != 1) {
+        (*e)++;
+    }
+
+    // Calculate private key d
+    *d = 1;
+    while (((*d) * (*e)) % phi != 1) {
+        (*d)++;
+    }
+
+    // Calculate modulus n
+    *n = p * q;
+}
+
+// Function to encrypt a message using RSA
+int encrypt(int message, int e, int n) {
+    return fmod(pow(message, e), n);
+}
+
+// Function to decrypt a message using RSA
+int decrypt(int encrypted_message, int d, int n) {
+    return fmod(pow(encrypted_message, d), n);
+}
+
+int main() {
+    int p = 61;  // Prime number
+    int q = 53;  // Prime number
+    int e, d, n;
+    generate_keys(p, q, &e, &d, &n);
+
+    int original_message = 123;
+    printf("Original message: %d\n", original_message);
+
+    int encrypted_message = encrypt(original_message, e, n);
+    printf("Encrypted message: %d\n", encrypted_message);
+
+    // Assume Bob's private key is leaked
+    printf("Bob's private key (d): %d\n", d);
+
+    // Now, let's assume Bob generates a new public and private key pair
+    // and continues using the same modulus (n)
+    int new_e, new_d, new_n;
+    generate_keys(p, q, &new_e, &new_d, &new_n);
+
+    printf("New public key (e): %d\n", new_e);
+    printf("New private key (d): %d\n", new_d);
+
+    // Decrypt the encrypted message using the new private key
+    int decrypted_message = decrypt(encrypted_message, new_d, new_n);
+    printf("Decrypted message with new private key: %d\n", decrypted_message);
+
+    return 0;
+}
