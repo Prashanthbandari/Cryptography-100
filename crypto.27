@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to calculate greatest common divisor (GCD)
+int gcd(int a, int b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+// Function to calculate modular exponentiation
+long long int mod_exp(long long int base, long long int exp, long long int mod) {
+    long long int result = 1;
+    base = base % mod;
+    while (exp > 0) {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
+        exp = exp >> 1;
+        base = (base * base) % mod;
+    }
+    return result;
+}
+
+// Function to generate public and private key pairs
+void generate_keys(long long int p, long long int q, long long int *e, long long int *d, long long int *n) {
+    long long int phi = (p - 1) * (q - 1);
+
+    // Choose public key e
+    *e = 2;
+    while (gcd(*e, phi) != 1) {
+        (*e)++;
+    }
+
+    // Calculate private key d
+    *d = 1;
+    while (((*d) * (*e)) % phi != 1) {
+        (*d)++;
+    }
+
+    // Calculate modulus n
+    *n = p * q;
+}
+
+// Function to encrypt a message using RSA
+long long int encrypt(long long int message, long long int e, long long int n) {
+    return mod_exp(message, e, n);
+}
+
+// Function to decrypt a message using RSA
+long long int decrypt(long long int encrypted_message, long long int d, long long int n) {
+    return mod_exp(encrypted_message, d, n);
+}
+
+int main() {
+    long long int p = 982451653;  // Large prime number
+    long long int q = 982451711;  // Large prime number
+    long long int e, d, n;
+    generate_keys(p, q, &e, &d, &n);
+
+    char message[] = "HELLO"; // Message to be encrypted
+    printf("Original message: %s\n", message);
+
+    long long int numerical_message = 0;
+    for (int i = 0; message[i] != '\0'; i++) {
+        numerical_message = numerical_message * 26 + (message[i] - 'A');
+    }
+
+    printf("Numerical message: %lld\n", numerical_message);
+
+    long long int encrypted_message = encrypt(numerical_message, e, n);
+    printf("Encrypted message: %lld\n", encrypted_message);
+
+    long long int decrypted_message = decrypt(encrypted_message, d, n);
+
+    printf("Decrypted message: ");
+    while (decrypted_message > 0) {
+        printf("%c", (char)((decrypted_message % 26) + 'A'));
+        decrypted_message /= 26;
+    }
+    printf("\n");
+
+    return 0;
+}
